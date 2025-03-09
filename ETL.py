@@ -1,6 +1,7 @@
 # Title: Expenses ETL process
 # Description: This script is written in Python and designed for managing expenses. It extracts data from a CSV file, transforms it for database insertion, and loads it into a MySQL database.
 # Version: 1.0 - The script runs perfectly after making some manual changes to the CSV file before execution. This version aims to minimize the need for these manual adjustments.
+#          1.1 - The category position in the CSV file no longer needs to be set manually. If the category is 'None,' the script will automatically assign the most recently used category.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -26,8 +27,10 @@ try:
 		print(x)
 
 	df = pd.read_csv('Despesas - Contas.csv')
-	df.fillna("R$0,00", inplace = True)
+	df.fillna("R$0,00", inplace = True)  # Find a Python function to update the null amounts to R$0.00 instead of this because there are other null columns
 
+	itemCategory = ""
+	
 	for i, row in df.iterrows(): # rows
 		position = 0
 		itemDateArray = np.array([])
@@ -39,7 +42,7 @@ try:
 				#print(f"Value: {col.replace('R$', '').replace('.', '').replace(',', '.')}")
 				#print(itemArray)
 				#print(row.index[position])
-			elif position == 0: itemCategory = col  #print(f"Category/{row.index[position]}: {col}")
+			elif position == 0: itemCategory = col.replace("R$0,00", itemCategory)  #print(f"Category/{row.index[position]}: {col}")
 			elif position == 1: itemSubcategory = col  #print(f"Subcategory/{row.index[position]}: {col}")
 			else: print(f"Error!")
 
