@@ -5,6 +5,7 @@
 #          1.2 - Improved category position handling when its value is null, and a query file is now generated after execution.
 #          1.3 - The last row in the CSV file, which contains the totals, no longer needs to be removed manually.
 #          2.0 - This version aims to improve the script.
+#          2.1 - Improved the error message for the column item identification.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -50,7 +51,9 @@ try:
 				#print(row.index[position])
 			elif position == 0: itemCategory = col.replace("R$0,00", itemCategory)  #print(f"Category/{row.index[position]}: {col}")
 			elif position == 1: itemSubcategory = col  #print(f"Subcategory/{row.index[position]}: {col}")
-			else: print(f"Error!")
+			else: 
+				print(f"Error while trying to identify the type of the column item! Position var: {position}")
+				raise StopIteration
 
 			position += 1
 
