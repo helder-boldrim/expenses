@@ -3,6 +3,7 @@
 # Version: 1.0 - The script runs perfectly after making some manual changes to the CSV file before execution. This version aims to minimize the need for these manual adjustments.
 #          1.1 - The category position in the CSV file no longer needs to be set manually. If the category is 'None,' the script will automatically assign the most recently used category.
 #          1.2 - Improved category position handling when its value is null, and a query file is now generated after execution.
+#          1.3 - The last row in the CSV file, which contains the totals, no longer needs to be removed manually.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -28,6 +29,7 @@ try:
 		print(x)
 
 	df = pd.read_csv('Despesas - Contas.csv')
+	df = df.head(-1)
 	df["Categoria"].fillna(df["Categoria"], inplace = True)
 	df.fillna("R$0,00", inplace = True)
 
