@@ -2,6 +2,7 @@
 # Description: This script is written in Python and designed for managing expenses. It extracts data from a CSV file, transforms it for database insertion, and loads it into a MySQL database.
 # Version: 1.0 - The script runs perfectly after making some manual changes to the CSV file before execution. This version aims to minimize the need for these manual adjustments.
 #          1.1 - The category position in the CSV file no longer needs to be set manually. If the category is 'None,' the script will automatically assign the most recently used category.
+#          1.2 - Improved category position handling when its value is null, and a query file is now generated after execution.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -27,9 +28,11 @@ try:
 		print(x)
 
 	df = pd.read_csv('Despesas - Contas.csv')
-	df.fillna("R$0,00", inplace = True)  # Find a Python function to update the null amounts to R$0.00 instead of this because there are other null columns
+	df["Categoria"].fillna(df["Categoria"], inplace = True)
+	df.fillna("R$0,00", inplace = True)
 
 	itemCategory = ""
+	itemDateArray = np.array([])
 	
 	for i, row in df.iterrows(): # rows
 		position = 0
@@ -47,10 +50,6 @@ try:
 			else: print(f"Error!")
 
 			position += 1
-		
-		#print("Cat: ", category)
-		#print("Sub: ", subcategory)
-		#print("Amt: ", itemArray)
 
 		# Data insertion
 		counter = 0
@@ -62,27 +61,30 @@ try:
 			mycursor.execute(sql, val)
 			counter += 1
 
-		mydb.commit()
-		print(mycursor.rowcount, "was inserted/deleted/updated. Last Row ID: ", mycursor.lastrowid)
+		#print(mycursor.rowcount, "was inserted/deleted/updated. Last Row ID: ", mycursor.lastrowid)
+		print(counter, "was inserted/deleted/updated. Last Row ID: ", mycursor.lastrowid)
+
 		print()
 
-	#df["  column  "].fillna("  replacement text  ", inplace = True)
+	# Query file creation
+	f = open("ExpensesQuery.sql", "wt")
+	#f.close()
 
-	"""data = {
-		"Categoria": ["Moradia","Moradia","Moradia"],
-		"Conta": ["Aluguel","Condomínio","Internet"],
-		"2024/07": ["R$1.345,89","R$150,00","R$100,00"],
-		"2024/08": ["R$1.345,89","R$170,00","R$105,00"],
-		"2024/09": ["R$1.431,68","R$170,00","R$105,00"],
-	}
+	#f = open("ExpensesQuery.sql", "at")
+	queryText = "Select \n\tcategory, \n\tsubcategory, "
 
-	df = pd.DataFrame(data)
+	for itemDates in itemDateArray:
+		queryText = queryText + f"\n\tSum(Case When date = '{itemDates}' Then amount End) As '{itemDates}',"
+	
+	queryText = queryText[:-1] + "\nFrom Expenses\nGroup By category, subcategory;"
 
-	print(df.loc[2])"""
-
+	f.write(queryText)
+	f.close()
 except BaseException as err:
 	print('Error: ', err.args)
+	mydb.rollback()
 else:
 	print("Success")
+	mydb.commit()
 finally:
 	print('Finished')
