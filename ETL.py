@@ -4,6 +4,7 @@
 #          1.1 - The category position in the CSV file no longer needs to be set manually. If the category is 'None,' the script will automatically assign the most recently used category.
 #          1.2 - Improved category position handling when its value is null, and a query file is now generated after execution.
 #          1.3 - The last row in the CSV file, which contains the totals, no longer needs to be removed manually.
+#          2.0 - This version aims to improve the script.
 try:
 	import mysql.connector
 	import pandas as pd
