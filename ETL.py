@@ -7,6 +7,7 @@
 #          1.4 - Cleaning script.
 #          2.0 - This version aims to improve the script.
 #          2.1 - Improved the error message for the column item identification.
+#          2.2 - Improved the logging algorithm and messages, updated MySQL database connection credentials and cleaned the script.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -14,8 +15,8 @@ try:
 
 	mydb = mysql.connector.connect(
 		host="localhost",
-		user="Helder",
-		password="H85qual#",
+		user="Python",
+		password="pait0m",
 		use_pure=True
 	)
 
@@ -51,15 +52,15 @@ try:
 			position += 1
 
 		counter = 0
+		affectedRows = 0
 		for itemDate in itemDateArray:
 			sql = "Insert Into EXPENSES (date, category, subcategory, amount) VALUES (%s, %s, %s, %s)"
 			val = (str(itemDate), itemCategory, itemSubcategory, float(itemAmountArray[counter]))
 			mycursor.execute(sql, val)
 			counter += 1
+			affectedRows += mycursor.rowcount
 
-		#print(mycursor.rowcount, "was inserted/deleted/updated. Last Row ID: ", mycursor.lastrowid)
-		print(counter, "was inserted/deleted/updated. Last Row ID: ", mycursor.lastrowid)
-		print()
+		print(f"{counter}/{affectedRows} rows were read/inserted for category \"{itemCategory}\" and subcategory \"{itemSubcategory}\".")
 
 	f = open("ExpensesQuery.sql", "wt")
 	queryText = "Select \n\tcategory, \n\tsubcategory, "
