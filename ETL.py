@@ -8,6 +8,7 @@
 #          2.0 - This version aims to improve the script.
 #          2.1 - Improved the error message for the column item identification.
 #          2.2 - Improved the logging algorithm and messages, updated MySQL database connection credentials and cleaned the script.
+#          3.0 - This version aims to translate some expense items from portuguese to english.
 try:
 	import mysql.connector
 	import pandas as pd
