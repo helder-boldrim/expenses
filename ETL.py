@@ -8,6 +8,7 @@
 #          2.0 - This version aims to improve the script.
 #          2.1 - Improved the error message for the column item identification.
 #          2.2 - Improved the logging algorithm and messages, updated MySQL database connection credentials and cleaned the script.
+#          2.3 - Added new column table for each tab on expenses spreadsheet and treated them.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -25,50 +26,54 @@ try:
 	mycursor.execute("Use pythondb")
 	sql = "Drop Table If Exists EXPENSES"
 	mycursor.execute(sql)
-	mycursor.execute("Create Table EXPENSES (date Varchar(7) NOT NULL, category Varchar(30) NOT NULL, subcategory Varchar(30) NOT NULL, amount Double DEFAULT 0)")
+	mycursor.execute("Create Table EXPENSES (date Varchar(7) NOT NULL, section Varchar(30) NOT NULL, category Varchar(30) NOT NULL, subcategory Varchar(30) NOT NULL, amount Double DEFAULT 0)")
 
-	df = pd.read_csv('Despesas - Contas.csv')
-	df = df.head(-1)
-	df["Categoria"].fillna(df["Categoria"], inplace = True)
-	df.fillna("R$0,00", inplace = True)
+	filesSet = ("Despesas - Contas.csv", "Despesas - Mercado.csv", "Despesas - Transporte.csv")
 
-	itemCategory = ""
-	itemDateArray = np.array([])
-	
-	for i, row in df.iterrows(): 
-		position = 0
+	for section in filesSet:
+		df = pd.read_csv(section)
+		df = df.head(-1)
+		df["Categoria"].fillna(df["Categoria"], inplace = True)
+		df.fillna("R$0,00", inplace = True)
+
+		itemSection = section[:-4].replace("Despesas - ", "")
+		itemCategory = ""
 		itemDateArray = np.array([])
-		itemAmountArray = np.array([])
-		for col in row: 
-			if position >= 2: 
-				itemDateArray = np.append(itemDateArray, row.index[position])
-				itemAmountArray = np.append(itemAmountArray, [float(col.replace('R$', '').replace('.', '').replace(',', '.'))])
-			elif position == 0: itemCategory = col.replace("R$0,00", itemCategory)
-			elif position == 1: itemSubcategory = col
-			else: 
-				print(f"Error while trying to identify the type of the column item! Position var: {position}")
-				raise StopIteration
+		
+		for i, row in df.iterrows(): 
+			position = 0
+			itemDateArray = np.array([])
+			itemAmountArray = np.array([])
+			for col in row: 
+				if position >= 2: 
+					itemDateArray = np.append(itemDateArray, row.index[position])
+					itemAmountArray = np.append(itemAmountArray, [float(col.replace('R$', '').replace('.', '').replace(',', '.'))])
+				elif position == 0: itemCategory = col.replace("R$0,00", itemCategory)
+				elif position == 1: itemSubcategory = col
+				else: 
+					print(f"Error while trying to identify the type of the column item! Position var: {position}")
+					raise StopIteration
 
-			position += 1
+				position += 1
 
-		counter = 0
-		affectedRows = 0
-		for itemDate in itemDateArray:
-			sql = "Insert Into EXPENSES (date, category, subcategory, amount) VALUES (%s, %s, %s, %s)"
-			val = (str(itemDate), itemCategory, itemSubcategory, float(itemAmountArray[counter]))
-			mycursor.execute(sql, val)
-			counter += 1
-			affectedRows += mycursor.rowcount
+			counter = 0
+			affectedRows = 0
+			for itemDate in itemDateArray:
+				sql = "Insert Into EXPENSES (date, section, category, subcategory, amount) VALUES (%s, %s, %s, %s, %s)"
+				val = (str(itemDate), itemSection, itemCategory, itemSubcategory, float(itemAmountArray[counter]))
+				mycursor.execute(sql, val)
+				counter += 1
+				affectedRows += mycursor.rowcount
 
-		print(f"{counter}/{affectedRows} rows were read/inserted for category \"{itemCategory}\" and subcategory \"{itemSubcategory}\".")
+			print(f"{counter}/{affectedRows} rows were read/inserted for category \"{itemCategory}\" and subcategory \"{itemSubcategory}\".")
 
 	f = open("ExpensesQuery.sql", "wt")
-	queryText = "Select \n\tcategory, \n\tsubcategory, "
+	queryText = "Select \n\tsection, \n\tcategory, \n\tsubcategory, "
 
 	for itemDates in itemDateArray:
 		queryText = queryText + f"\n\tSum(Case When date = '{itemDates}' Then amount End) As '{itemDates}',"
 
-	queryText = queryText[:-1] + "\nFrom Expenses\nGroup By category, subcategory;"
+	queryText = queryText[:-1] + "\nFrom Expenses\nGroup By section, category, subcategory;"
 
 	f.write(queryText)
 	f.close()
