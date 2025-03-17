@@ -9,6 +9,8 @@
 #          2.1 - Improved the error message for the column item identification.
 #          2.2 - Improved the logging algorithm and messages, updated MySQL database connection credentials and cleaned the script.
 #          2.3 - Added new column table for each tab on expenses spreadsheet and treated them.
+#          3.0 - This version aims to translate some expense items from portuguese to english.
+#          3.1 - Translated expense items from Portuguese to English.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -55,6 +57,31 @@ try:
 					raise StopIteration
 
 				position += 1
+
+			# Translation section - pt-BR to en
+			match itemCategory:
+				case 'Moradia': itemCategory = 'Residence'
+				case 'Lazer': itemCategory = 'Leisure'
+				case 'Outros': itemCategory = 'Others'
+
+			match itemSubcategory:
+				case 'Aluguel': itemSubcategory = 'Rent'
+				case 'Condomínio': itemSubcategory = 'Service Charge'
+				case 'Conta de Agua': itemSubcategory = 'Water Bill'
+				case 'Conta de Luz': itemSubcategory = 'Energy Bill'
+				#case 'Internet': itemSubcategory = 'Internet'
+				case 'Spotify': itemSubcategory = 'Music'
+				case 'Netflix': itemSubcategory = 'Video'
+				case 'Xbox': itemSubcategory = 'Games'
+				case 'Viagens': itemSubcategory = 'Travels'
+				case 'Festas': itemSubcategory = 'Parties'
+				case 'Presentes': itemSubcategory = 'Gifts'
+				case 'Cabelo/Barba': itemSubcategory = 'Haircut'
+				case 'INSS': itemSubcategory = 'Social Security'
+				case 'Internet movel': itemSubcategory = 'Mobile Internet'
+				case 'Restaurantes': itemSubcategory = 'Restaurants'
+				case 'Roupas': itemSubcategory = 'Clothes'
+				case 'Saude/Farmacos': itemSubcategory = 'Health/Medicines'
 
 			counter = 0
 			affectedRows = 0
