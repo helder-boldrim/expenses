@@ -11,6 +11,7 @@
 #          2.3 - Added new column table for each tab on expenses spreadsheet and treated them.
 #          3.0 - This version aims to translate some expense items from portuguese to english.
 #          3.1 - Translated expense items from Portuguese to English.
+#          3.2 - Translated remaining expense items from Portuguese to English.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -59,9 +60,23 @@ try:
 				position += 1
 
 			# Translation section - pt-BR to en
+			match itemSection:
+				case 'Contas': itemSection = 'Bills'
+				case 'Mercado': itemSection = 'Grocery'
+				case 'Transporte': itemSection = 'Transport'
+
 			match itemCategory:
 				case 'Moradia': itemCategory = 'Residence'
 				case 'Lazer': itemCategory = 'Leisure'
+				case 'Saladas': itemCategory = 'Vegetables'
+				case 'Proteinas': itemCategory = 'Proteins'
+				case 'Carboidratos': itemCategory = 'Carbohydrates'
+				case 'Frutas': itemCategory = 'Fruits'
+				case 'Laticinios': itemCategory = 'Dairy'
+				case 'Higiene': itemCategory = 'Hygiene'
+				case 'Itens': itemCategory = 'Items'
+				case 'Carro': itemCategory = 'Car'
+				case 'Moto': itemCategory = 'Motorcycle'
 				case 'Outros': itemCategory = 'Others'
 
 			match itemSubcategory:
@@ -69,7 +84,7 @@ try:
 				case 'Condomínio': itemSubcategory = 'Service Charge'
 				case 'Conta de Agua': itemSubcategory = 'Water Bill'
 				case 'Conta de Luz': itemSubcategory = 'Energy Bill'
-				#case 'Internet': itemSubcategory = 'Internet'
+				case 'Internet': itemSubcategory = 'Internet'
 				case 'Spotify': itemSubcategory = 'Music'
 				case 'Netflix': itemSubcategory = 'Video'
 				case 'Xbox': itemSubcategory = 'Games'
@@ -82,6 +97,52 @@ try:
 				case 'Restaurantes': itemSubcategory = 'Restaurants'
 				case 'Roupas': itemSubcategory = 'Clothes'
 				case 'Saude/Farmacos': itemSubcategory = 'Health/Medicines'
+				case 'Salada Pronta': itemSubcategory = 'Ready Salad'
+				case 'Alface/Rucula': itemSubcategory = 'Lettuce/Arugula'
+				case 'Brocolis/Couve flor': itemSubcategory = 'Broccoli/Cauliflower'
+				case 'Cenoura/Beterraba': itemSubcategory = 'Carrot/Beetroot'
+				case 'Tomate': itemSubcategory = 'Tomato'
+				case 'Atum': itemSubcategory = 'Tuna'
+				case 'Boi': itemSubcategory = 'Ox'
+				case 'Frango': itemSubcategory = 'Chicken'
+				case 'Porco': itemSubcategory = 'Pig'
+				case 'Ovos': itemSubcategory = 'Eggs'
+				case 'Graos': itemSubcategory = 'Grains'
+				case 'Pao': itemSubcategory = 'Bread'
+				case 'Banana': itemSubcategory = 'Banana'
+				case 'Maca': itemSubcategory = 'Apple'
+				case 'Uva': itemSubcategory = 'Grape'
+				case 'Leite': itemSubcategory = 'Milk'
+				case 'Manteiga': itemSubcategory = 'Butter'
+				case 'Queijo': itemSubcategory = 'Cheese'
+				case 'Requeijao': itemSubcategory = 'Cream Cheese'
+				case 'Banho': itemSubcategory = 'Bath'
+				case 'Bucal': itemSubcategory = 'Oral'
+				case 'Limpeza': itemSubcategory = 'Cleaning'
+				case 'Papel Higienico': itemSubcategory = 'Toilet Paper'
+				case 'Pos Banho': itemSubcategory = 'Post Bath'
+				case 'Banho': itemSubcategory = 'Bath'
+				case 'Cama': itemSubcategory = 'Bed'
+				case 'Cozinha': itemSubcategory = 'Kitchen'
+				case 'Limpeza': itemSubcategory = 'Cleaning'
+				case 'Agua': itemSubcategory = 'Water'
+				case 'Azeite': itemSubcategory = 'Olive Oil'
+				case 'Geleia/Doce de leite': itemSubcategory = 'Jelly'
+				case 'Junk': itemSubcategory = 'Junk'
+				case 'Refrigerante/Suco': itemSubcategory = 'Soda/Juice'
+				case 'Suplementos': itemSubcategory = 'Suplements'
+				case 'Temperos/Molhos': itemSubcategory = 'Spices/Sauces'
+				case 'Combustivel': itemSubcategory = 'Gas'
+				case 'Impostos': itemSubcategory = 'Taxes'
+				case 'Lavagem': itemSubcategory = 'Washing'
+				case 'Manutencao': itemSubcategory = 'Maintenance'
+				case 'Pedagio': itemSubcategory = 'Toll'
+				case 'Oleo': itemSubcategory = 'Oil'
+				case 'Cateira Habilitacao': itemSubcategory = 'Drivers License'
+				case 'Onibus': itemSubcategory = 'Bus'
+				case 'Uber': itemSubcategory = 'Taxi'
+				case 'Aviao': itemSubcategory = 'Plane'
+				case 'Outros': itemSubcategory = 'Others'
 
 			counter = 0
 			affectedRows = 0
