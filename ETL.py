@@ -13,6 +13,7 @@
 #          3.1 - Translated expense items from Portuguese to English.
 #          3.2 - Translated remaining expense items from Portuguese to English.
 #          4.0 - This version aims to enhance MySQL database structure.
+#          4.1 - Modified the Expenses table and created tables for Section, Category and Subcategory.
 try:
 	import mysql.connector
 	import pandas as pd
@@ -26,11 +27,11 @@ try:
 	)
 
 	mycursor = mydb.cursor(buffered=True)
-
 	mycursor.execute("Use pythondb")
-	sql = "Drop Table If Exists EXPENSES"
-	mycursor.execute(sql)
-	mycursor.execute("Create Table EXPENSES (date Varchar(7) NOT NULL, section Varchar(30) NOT NULL, category Varchar(30) NOT NULL, subcategory Varchar(30) NOT NULL, amount Double DEFAULT 0)")
+
+	f = open("Expenses.ddl", "rt")
+	mycursor.execute(f.read())
+	f.close()
 
 	filesSet = ("Despesas - Contas.csv", "Despesas - Mercado.csv", "Despesas - Transporte.csv")
 
@@ -51,7 +52,7 @@ try:
 			for col in row: 
 				if position >= 2: 
 					itemDateArray = np.append(itemDateArray, row.index[position])
-					itemAmountArray = np.append(itemAmountArray, [float(col.replace('R$', '').replace('.', '').replace(',', '.'))])
+					itemAmountArray = np.append(itemAmountArray, float(col.replace('R$', '').replace('.', '').replace(',', '.')))
 				elif position == 0: itemCategory = col.replace("R$0,00", itemCategory)
 				elif position == 1: itemSubcategory = col
 				else: 
@@ -60,7 +61,7 @@ try:
 
 				position += 1
 
-			# Translation section - pt-BR to en
+			# Translation section | pt-BR to en | Once the performance gets descreased, the algorithm for this will be changed
 			match itemSection:
 				case 'Contas': itemSection = 'Bills'
 				case 'Mercado': itemSection = 'Grocery'
@@ -156,6 +157,7 @@ try:
 
 			print(f"{counter}/{affectedRows} rows were read/inserted for category \"{itemCategory}\" and subcategory \"{itemSubcategory}\".")
 
+	# Query file creation
 	f = open("ExpensesQuery.sql", "wt")
 	queryText = "Select \n\tsection, \n\tcategory, \n\tsubcategory, "
 
