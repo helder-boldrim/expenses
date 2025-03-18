@@ -12,6 +12,7 @@
 #          3.0 - This version aims to translate some expense items from portuguese to english.
 #          3.1 - Translated expense items from Portuguese to English.
 #          3.2 - Translated remaining expense items from Portuguese to English.
+#          4.0 - This version aims to enhance MySQL database structure.
 try:
 	import mysql.connector
 	import pandas as pd
